@@ -6,8 +6,8 @@ library(Hmisc)
 unique.timestamps <- unique(data$timestamp)
 time.key <- as.data.frame(unique.timestamps) %>%
   group_by()
-
-
+time.key %>% arrange(timestamp) #orders time.key by ascending timestamp (assumes ALS function splits into bins by timestamp below)
+#bins <- split(time.key, (0:nrow(time.key) %/% 30)) #if ALS code below doesn't automatically split it into equal groups. can change the number of bins in this line
 
 #Define a function to calculate RMSE
 RMSE <- function(rating, est_rating){
