@@ -6,8 +6,8 @@ library(Hmisc)
 unique.timestamps <- unique(data$timestamp)
 time.key <- as.data.frame(unique.timestamps) %>%
   group_by()
-
-
+time.key %>% arrange(timestamp) #orders time.key by ascending timestamp (assumes ALS function splits into bins by timestamp below)
+#bins <- split(time.key, (0:nrow(time.key) %/% 30)) #if ALS code below doesn't automatically split it into equal groups. can change the number of bins in this line
 
 #Define a function to calculate RMSE
 RMSE <- function(rating, est_rating){
@@ -69,12 +69,19 @@ als.function <- function(){
       r.u[t] <- r.u.t
     }
     
+    #makes sense to iterate with changing user bias for each minimization iteration over p and with changing item bias for each minimization iteration over q?
+    #makes sense to use vectors instead of line by line here?
+    #section 3.1 Large-scale Parallel Collaborative Filtering for the Netflix Prize
+    #(movie matrix * movie matrix _transpose + lamda normalization identity)* user matrix
+    #(user matrix * user matric_transpose + lambda normalization identity)* movie matrix
+
+    
  #Step 3 Fix p and solve q
     
-    r.i.t <- mu + b.u + b.i + bi.bin.t
+    r.i.t <- mu + b.u + b.i + bi.bin.t # we think this should be in the iteration, but that only move 
     
     
-
+#error <- sum (actual rating - r.i.t^2) + lambda*(norm(q)^2+norm(p^2 + b.u^2 + b.i^2))
   error <- sum(((r.u - q[,i] * p[,u])^2)+lambda*(norm(q)^2 + norm(p)^2))
   
 
