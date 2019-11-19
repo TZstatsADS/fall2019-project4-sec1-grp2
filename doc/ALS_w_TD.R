@@ -1,13 +1,26 @@
 library(dplyr)
 library(Hmisc)
+library(anytime)
+library(lubridate)
 
-#Assigning time bins for temporal regularizations
+#Function to assigning time bins for temporal regularization
 
-unique.timestamps <- unique(data$timestamp)
-time.key <- as.data.frame(unique.timestamps) %>%
-  group_by()
-time.key %>% arrange(timestamp) #orders time.key by ascending timestamp (assumes ALS function splits into bins by timestamp below)
-#bins <- split(time.key, (0:nrow(time.key) %/% 30)) #if ALS code below doesn't automatically split it into equal groups. can change the number of bins in this line
+assign.bins <- function(df) {
+  
+
+    
+    TEST <-df %>%
+            mutate(New.Time = as.Date(anytime(timestamp))) %>%
+            mutate(Year = year(ymd(New.Time))) 
+    
+    TEST$Bin <- group_indices(TEST,Year)
+    
+     return(TEST %>%
+             select(userId,movieId,rating,Year,Bin))
+  
+  
+}
+
 
 #Define a function to calculate RMSE
 RMSE <- function(rating, est_rating){
@@ -21,17 +34,23 @@ RMSE <- function(rating, est_rating){
 
 #Alternating Least Squares
 
-U <- length(unique(data$userId))
-I <- length(unique(data$movieId))
+U <- length(unique(data$userId)) #Number of users
+M <- length(unique(data$movieId)) #Number of movies
 alpha <- 5
 beta <- 0.4
-num.bins <- 30
+
+
+
+max.iter <- 10
 
 als.function <- function(){
+  
 
-  p <- matrix(runif(U, -1, 1), ncol = U) #User matrix
+
+  
+  p <- matrix(runif(U, -1, 1), ncol = U, nrow = M) #User matrix
   colnames(p) <- as.character(1:U)
-  q <- matrix(runif(I, -1, 1), ncol = I) 
+  q <- matrix(runif(M, -1, 1), ncol = M, nrow = U) 
   colnames(q) <- levels(as.factor(data$movieId)) #Movie Matrix
 
   train_RMSE <- c()
@@ -46,59 +65,104 @@ als.function <- function(){
     select(Mean.Rating) #Taking all mean ratings
     
   
-  q[1,] <- as.vector(new.row$Mean.Rating)
+  q[1,] <- as.vector(new.row$Mean.Rating) #Assign mean ratings to first row
   
+
+  
+
   mu <- mean(new.row$Mean.Rating) #Average of all the mean ratings
   
-  for (t in 1:num.bins) {
-    
-    bin.dat <- data[data$time.group == t,]
+  data <- assign.bins(data) #Assigning bins
   
-#Step 2: Fix q and minimize p (sum over users)?
+  b.i <- new.row$Mean.Rating - mu #Overall movie bias
   
-    for (s in 1:U) {
-      
-      t.u <- mean(bin.dat$time.group)
-      
-      dev.ut <- sign(t-t.u)*(abs(t-t.u)^beta)
-      
-      b.i <- (mean(q[,s])-mu) 
-      
-      r.u.t <- mu + (mean(p[,s])-mu) + alpha*dev.ut + b.i #+ bi.bin.t
-      
-      r.u[t] <- r.u.t
-    }
+  new.data <- data %>%
+    group_by(userId) %>%
+    summarise(b = mean(rating))
+  
+  b.u <- new.data$b - mu #Overall user bias
+  
+  new.data <- data %>%
+    group_by(Bin) %>%
+    summarise(Bias = mean(rating))
+  
+  bin.bias <- new.data$Bias - mu #Bias for each bin (year)
+  
+  b.i.bin <- data %>%
+    mutate(Bin.Bias = ifelse())
+  
+  new.data <- data %>%
+    group_by(userId) %>%
+    summarise(t = mean(Bin))
+  
+  t.u <- new.data$t #Mean bin for each user 
+  
+  bin.index <- unique(data$Bin) #Bin index (1:23) 
+  
+  dev.t.u <- rep(NA,U)
+  b.u.t <- rep(NA,U)
+  
+
+
+  for (t in 1:length(bin.index)) {
     
-    #makes sense to iterate with changing user bias for each minimization iteration over p and with changing item bias for each minimization iteration over q?
-    #makes sense to use vectors instead of line by line here?
-    #section 3.1 Large-scale Parallel Collaborative Filtering for the Netflix Prize
-    #(movie matrix * movie matrix _transpose + lamda normalization identity)* user matrix
-    #(user matrix * user matric_transpose + lambda normalization identity)* movie matrix
+    current.bin <- t
+   
+    for (u in 1:U) {
+      
+      dev.t.u[u] <- sign(current.bin - t.u[u])*(abs(current.bin-t.u[u]))^beta #Time deviation for each user
+      
+      b.u.t[u] <- b.u[u] + alpha*dev.t.u[u] #User bias with time deviations 
+       
+     
+      
+    }  
 
     
- #Step 3 Fix p and solve q
     
-    r.i.t <- mu + b.u + b.i + bi.bin.t # we think this should be in the iteration, but that only move 
+  }
+   
+   
+
+  
+  for (m in 1:U) {
     
+    #Step 2: Fix q and minimize p (sum over users)
+    
+    p[,m] <- b.i + mu + b.u[m] + alpha*dev.t.u[m] + b.u.t[m] + (q[m,])*p[,m] #+ bin.bias[t] #Assigning row of estimated ratings for each user
+    
+    
+  }
+  
+  #Step 3: Fix p and minimize q
+  
+  for (n in 1:U) {
+    n<-1
+    
+    q[n,] <- b.i + mu + b.u[n] + alpha*dev.t.u[n] + b.u.t[n] + (q[n,])*p[,n]
+    
+  }
+  
+
+}
+  
+
+
+
+  
     
 #error <- sum (actual rating - r.i.t^2) + lambda*(norm(q)^2+norm(p^2 + b.u^2 + b.i^2))
   error <- sum(((r.u - q[,i] * p[,u])^2)+lambda*(norm(q)^2 + norm(p)^2))
   
 
   
-  
-  }
-
-
-  
-  
-  
-}
 
 
 
 
 
+ggplot(data,aes(x=timestamp)) + geom_histogram(color="blue",fill="lightblue",binwidth = 20) 
++ ggtitle("Histogram of Time Stamps")
 
 
 
