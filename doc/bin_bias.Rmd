@@ -1,0 +1,57 @@
+---
+title: "bin bias"
+output: html_notebook
+editor_options: 
+  chunk_output_type: inline
+---
+bin bias!
+```{r}
+library(dplyr)
+library(Hmisc)
+library(anytime)
+library(lubridate)
+data <- read.csv("./output/data_train_proportional.csv")
+```
+
+```{r}
+#Function to assigning time bins for temporal regularization
+
+assign.bins <- function(df) {
+  
+    
+    TEST <-df %>%
+            mutate(New.Time = as.Date(anytime(timestamp))) %>%
+            mutate(Year = year(ymd(New.Time))) 
+    
+    TEST$Bin <- group_indices(TEST,Year)
+    
+     return(TEST %>%
+             select(userId,movieId,rating,Year,Bin))
+  
+}
+
+```
+mean ratings for each movie
+
+```{r}
+data <- assign.bins(data) #Assigning bins
+
+new.row <- data %>% 
+  group_by(movieId) %>%
+  mutate(Mean.Rating = mean(rating)) #Taking all mean ratings
+```
+
+```{r}
+mu <- mean(new.row$Mean.Rating) #Average of all the mean ratings
+
+data$b.i <- new.row$Mean.Rating - mu #Overall movie bias
+
+
+new.data <- data %>%
+  group_by(Bin, movieId) %>%
+  mutate(bin.bias = mean(rating) - mu) %>%  #bin bias for each movie
+  group_by(movieId) %>%
+  mutate(b.i = mean(rating) - mu )  #add bin bias to correct rows
+
+```
+
