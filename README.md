@@ -24,7 +24,7 @@ Term: Fall 2019
 
 [Temporal Dynamics](./paper/P5 Collaborative Filtering with Temporal Dynamics.pdf)
 	
-**Contribution statement**: All team members discussed a project timeline. Yicheng worked on the base ALS with KNN/SVD and Samir worked on hyper-parameter tuning of SVD/KNN. Richard and Samir worked on adding the penalty of magnitudes and bias/intercept regularizations. All team members helped with the temporal dynamic regularizations. Richard wrote the presentation and will be presenting the results. 
+**Contribution statement**: All team members discussed a project timeline. Yicheng worked on the base ALS with KNN/SVD and Samir worked on hyper-parameter tuning for the SVD/KNN post processing. Richard and Samir worked on adding the penalty of magnitudes and bias/intercept regularizations. All team members helped with the temporal dynamic regularizations. Richard wrote the presentation and will be presenting the results. 
 
 Following [suggestions](http://nicercode.github.io/blog/2013-04-05-projects/) by [RICH FITZJOHN](http://nicercode.github.io/about/#Team) (@richfitz). This folder is orgarnized as follows.
 
