@@ -5,16 +5,16 @@
 Term: Fall 2019
 
 + Team #
-+ Projec title: Lorem ipsum dolor sit amet
++ Projec title: Alternating Least Squares for Collaborative Filtering
 + Team members
-	+ team member 1
-	+ team member 2
-	+ team member 3
-	+ team member 4
-	+ team member 5
-+ Project summary: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+	+ Ashley Culver
+	+ Alexandra DeKinder
+	+ Samir Hadzic
+	+ Richard Lee
+	+ Yicheng Li
++ Project summary: The purpose of this project was to implement several versions of the [Alternating Least Squares](./paper/P4 Large-scale Parallel Collaborative Filtering for the Netflix Prize.pdf) algorithm for collaborative filtering. The goal of collaborative filtering is to develop a recommender system to match users with products. In this project, we focus on building a recommender system for movies, similar to the goal of the Netflix competition discussed in the paper on ALS. The three versions of ALS used are a base ALS with KNN an SVD post processing, found here: [Postprocessing SVD with KNN](./paper/P2 Improving regularized singular value decomposition for collaborative filtering .pdf) Section 3.5, ALS with penalty of magnitudes and bias and intercept regularizations ([Penalty of Magnitudes](./paper/P1 Recommender-Systems.pdf) Section: a Basic Matrix Factorization Model, [Bias and Intercepts](./paper/P1 Recommender-Systems.pdf) Section: Adding Biases), and finally ALS with [Temporal Dynamics](./paper/P5 Collaborative Filtering with Temporal Dynamics.pdf). All of the regularizations are accompanied by postprocessing with KNN and SVD. We devloped the algorithms and generated reports using Python.
 	
-**Contribution statement**: [default] All team members contributed equally in all stages of this project. All team members approve our work presented in this GitHub repository including this contributions statement. 
+**Contribution statement**: All team members discussed a project timeline. Yicheng worked on the base ALS with KNN/SVD. Richard and Samir worked on adding the penalty of magnitudes and bias/intercept regularizations. All team members helped with the temporal dynamic regularizations. Richard wrote the presentation and will be presenting the results. 
 
 Following [suggestions](http://nicercode.github.io/blog/2013-04-05-projects/) by [RICH FITZJOHN](http://nicercode.github.io/about/#Team) (@richfitz). This folder is orgarnized as follows.
 
