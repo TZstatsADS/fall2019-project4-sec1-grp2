@@ -1,0 +1,93 @@
+---
+title: "bin + user bias"
+output: html_notebook
+editor_options: 
+  chunk_output_type: inline
+---
+bin bias!
+```{r}
+library(dplyr)
+library(Hmisc)
+library(anytime)
+library(lubridate)
+data <- read.csv("../output/data_train_proportional.csv")
+```
+
+```{r}
+#Function to assigning time bins for temporal regularization
+
+assign.bins <- function(df) {
+  
+    
+    TEST <-data %>%
+            mutate(New.Time = as.Date(anytime(timestamp))) %>%
+            mutate(New.Date = ymd(New.Time)) 
+    
+    TEST$Bin <- group_indices(TEST,New.Date)
+    
+     return(TEST %>%
+             select(userId,movieId,rating,New.Date,Bin))
+  
+}
+
+```
+mean ratings for each movie
+
+```{r}
+data <- assign.bins(data) #Assigning bins
+
+new.row <- data %>% 
+  group_by(movieId) %>%
+  mutate(Mean.Rating = mean(rating)) #Taking all mean ratings
+```
+item bias (movie bias)
+```{r}
+mu <- mean(new.row$Mean.Rating) #Average of all the mean ratings 
+
+data$b.i <- new.row$Mean.Rating - mu #Overall movie bias
+```
+
+bin bias
+```{r}
+
+new.data <- data %>%
+  group_by(Bin, movieId) %>%
+  mutate(bin.bias = mean(rating) - mu) #bin bias for each movie
+
+```
+user bias!
+
+```{r}
+new.data <- new.data %>%
+  group_by(userId) %>%
+  mutate(b.u = mean(rating)-mu) %>%  #overall user bias
+  mutate(b.ui = mu + b.i + b.u )  #add bin bias to correct rows
+
+beta <- 0.4 #from P5
+alpha <- .1
+zz.final.data <- new.data %>% 
+  group_by(userId) %>%
+  mutate(t.u = mean(Bin)) %>%
+  mutate(dev.t = sign(Bin-t.u)*(abs(Bin-t.u))^beta) %>%
+  mutate(Final_Rating = rating + b.i + bin.bias + b.u + alpha *dev.t) %>%
+  mutate(Final_Rating_mu = rating + mu + b.i + b.u) %>%
+  
+  
+  
+  
+  
+  select(-rating) %>%
+  rename(rating = Final_Rating) %>%
+  select(userId,movieId,rating) %>%
+  group_by(movieId) %>%
+  summarise(mean.r = mean(rating))
+
+
+  
+  
+  #time deviation user bias
+
+
+
+```
+
