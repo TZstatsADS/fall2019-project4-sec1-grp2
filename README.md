@@ -12,7 +12,7 @@ Term: Fall 2019
 	+ Samir Hadzic
 	+ Richard Lee
 	+ Yicheng Li
-+ Project summary: The purpose of this project was to implement several versions of the Alternating Least Squares algorithm for collaborative filtering. The goal of collaborative filtering is to develop a recommender system to match users with products. In this project, we focus on building a recommender system for movies, similar to the goal of the Netflix competition discussed in the paper on ALS. The three versions of ALS used are a base ALS with KNN an SVD post processing, ALS with penalty of magnitudes and bias and intercept regularizations, and finally ALS with temporal regularizations. All of the regularizations are accompanied by postprocessing with KNN and SVD. We devloped the algorithms and generated reports using Python. Reference papers are listed below:
++ Project summary: The purpose of this project was to implement several versions of the Alternating Least Squares algorithm for collaborative filtering. The goal of collaborative filtering is to develop a recommender system to match users with products. In this project, we focus on building a recommender system for movies, similar to the goal of the Netflix competition discussed in the paper on ALS. The three versions of ALS used are a base ALS with KNN and SVD post processing, ALS with penalty of magnitudes and bias and intercept regularizations, and finally ALS with temporal regularizations. All of the regularizations are accompanied by postprocessing with KNN and SVD. We devloped the algorithms and generated reports using Python. Reference papers are listed below:
 
 [Alternating Least Squares](./paper/P4 Large-scale Parallel Collaborative Filtering for the Netflix Prize.pdf)
 
