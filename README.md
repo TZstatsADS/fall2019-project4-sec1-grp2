@@ -4,7 +4,7 @@
 
 Term: Fall 2019
 
-+ Team #
++ Team #2
 + Projec title: Alternating Least Squares for Collaborative Filtering
 + Team members
 	+ Ashley Culver
